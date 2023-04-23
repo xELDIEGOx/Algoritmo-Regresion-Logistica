@@ -1,0 +1,42 @@
+#Seleccionamos los datos desde una base de datos externa, en donde seran los datos del titanic
+
+titanic = read.csv(file = 'https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv')
+
+#inicializamos la libreria y eleccionamos las variables que necesitamos
+
+library(dplyr)
+titanic %>%
+  select(survived , sex  , age ) -> titanicT
+
+#entrenamos al modelo 1 con la variable dependiente que es survive y las independientes que son sex y age
+#luego identificamos la base de datos y el modelo que representaremos que es un binomial ya que existen dos vairables
+
+model1 <- glm(formula = survived ~ sex + age, data = titanicT, family = 'binomial')
+
+#mostramos los coeficientes con la funcion summary de sex y age
+
+summary(model1)
+
+#Realizamos las predicciones con el comando predict, pasando el modelo, la base de datos y el tipo
+#donde ubicamos response para que no indique si sobrevive o no
+
+predictorio <- predict.glm(object = model1, newdata = titanicT, type = 'response')
+
+#categorizamos los valores, si son mayores al 0.51 sobrevive y si no, no sobrevive
+predictorio <- ifelse(test = predictorio > 0.5, yes = 1, no = 0)
+
+#comparamos realidad con predicciones para visualizar los fallos del modelo
+titanicT %>%
+  mutate(predicciones = predictorio) %>%
+  #ordenamos las predicciones
+  select(predicciones, everything())%>%
+  #realizamos comparaciones teniendo como resultado true o false segun corresponda
+  mutate(comparaciones = predicciones == survived) ->titanicRes
+
+#Como ultima instancia mostramos la  precision del modelo sumando y dividiendo para 
+#cantidad de registros, eliminando los datos perdidos para que no influya
+
+mean(titanicRes$comparaciones, na.rm = TRUE) -> prev
+
+#La precision del modelo es de 78%
+prev*100
