@@ -1,0 +1,43 @@
+#Seleccionamos los datos desde una base de datos externa,donde tenemos una tabla con datos imaginario de un Hospital
+
+hospital = read.csv(file = 'https://raw.githubusercontent.com/xELDIEGOx/Algoritmo-Regresion-Logistica/main/datosHospital.csv')
+
+#inicializamos la libreria y seleccionamos las variables que necesitamos
+
+library(dplyr)
+hospital %>%
+  select( estado, genero, edad ) -> hospitalV
+
+#entrenamos al modelo 1 con la variable dependiente que es estado y las independientes que son el genero y la edad
+#luego identificamos la base de datos y el modelo que representaremos que es un binomial ya que existen dos vairables
+
+model1 <- glm(formula = estado ~ genero + edad, data = hospitalV, family = 'binomial')
+
+#mostramos los coeficientes con la funcion summary como son genero y edad
+
+summary(model1)
+
+#Realizamos las predicciones con el comando predict, pasando el modelo, la base de datos y el tipo
+#donde ubicamos response para que no indique su estado
+
+predictorio <- predict.glm(object = model1, newdata = hospitalV, type = 'response')
+
+#categorizamos los valores, si son mayores al 0.51 vive y es igual a 1, caso contrario 0
+predictorio <- ifelse(test = predictorio > 0.5, yes = 1, no = 0)
+
+#comparamos realidad con predicciones para visualizar los fallos del modelo
+hospitalV %>%
+  #añadimos una nueva columna llamada predicciones donde se almacenan los datos de predictorio
+  mutate(predicciones = predictorio) %>%
+  #ordenamos las predicciones
+  select(predicciones, everything())%>%
+  #realizamos comparaciones teniendo como resultado true o false segun corresponda
+  mutate(comparaciones = predicciones == estado) ->hospitalRes
+
+#Como ultima instancia mostramos la  precision del modelo sumando y dividiendo para 
+#cantidad de registros, eliminando los datos perdidos para que no influya
+
+mean(hospitalRes$comparaciones, na.rm = TRUE) -> prev
+
+#La precision del modelo es de:
+prev*100
