@@ -1,4 +1,7 @@
 estado,genero,edad,mayoriaEdad,vivo
+1,hombres,19.00,False,si
+1,mujeres,17.00,False,si
+1,mujeres,19.00,False,si
 0,hombres,22.00,True,no
 1,mujeres,38.00,False,si
 1,mujeres,4.00,False,si
@@ -138,3 +141,6 @@ estado,genero,edad,mayoriaEdad,vivo
 1,mujeres,22.00,False,si
 1,mujeres,24.00,False,si
 0,hombres,19.00,True,no
+1,mujeres,17.00,False,si
+0,hombres,22.00,True,no
+1,hombres,0.83,False,si
